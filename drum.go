@@ -14,6 +14,7 @@ type Pattern struct {
 	Tracks  []Track
 }
 
+// String returns a string representation of a splice drump pattern
 func (p Pattern) String() string {
 	out := fmt.Sprintf("Saved with HW Version: %s\nTempo: %g\n", p.Version, p.Tempo)
 	for _, track := range p.Tracks {
@@ -22,12 +23,15 @@ func (p Pattern) String() string {
 	return out
 }
 
+// Track represents a single piece of the drum track
 type Track struct {
 	ID    uint8
 	Name  string
 	Steps []byte
 }
 
+// String returns a string representation of a track.
+// 'x' represents when the piece makes a sound.
 func (t Track) String() string {
 	out := fmt.Sprintf("(%d) %s", t.ID, t.Name)
 	measure := "|"
