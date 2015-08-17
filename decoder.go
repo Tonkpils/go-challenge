@@ -3,6 +3,7 @@ package drum
 import (
 	"encoding/binary"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -40,13 +41,13 @@ func (d *Decoder) Decode(p *Pattern) error {
 	n, err := d.spliceHeaderInfo()
 	if err != nil {
 		if err != io.EOF && err != io.ErrUnexpectedEOF {
-			return errors.New("unable to decode .splice file header: " + err.Error())
+			return fmt.Errorf("invalid .splice header: %s", err)
 		}
 	}
 
 	if err := d.decodeBody(p, n); err != nil {
 		if err != io.EOF && err != io.ErrUnexpectedEOF {
-			return errors.New("unable to decode .splice format: " + err.Error())
+			return fmt.Errorf("unable to decode .splice format: %s", err)
 		}
 	}
 	return nil
