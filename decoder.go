@@ -9,6 +9,16 @@ import (
 	"strings"
 )
 
+const (
+	sizeSplice       = 6
+	sizeVersion      = 32
+	sizeTempo        = 4
+	sizeVersionTempo = sizeVersion + sizeTempo
+	sizeID           = 1
+	sizeName         = 4
+	sizeMeasure      = 16
+)
+
 // DecodeFile decodes the drum machine file found at the provided path
 // and returns a pointer to a parsed pattern which is the entry point to the
 // rest of the data.
@@ -57,7 +67,7 @@ func (d *Decoder) Decode(p *Pattern) error {
 // and returns the size of the file contents or error if it's
 // unable check the SPLICE portion or read the headers
 func (d *Decoder) spliceHeaderInfo() (uint64, error) {
-	hdr := make([]byte, 6)
+	hdr := make([]byte, sizeSplice)
 	if _, err := io.ReadFull(d, hdr); err != nil {
 		return 0, err
 	}
@@ -77,7 +87,7 @@ func (d *Decoder) spliceHeaderInfo() (uint64, error) {
 // and into p. It returns EOF or ErrUnexpectedEOF if it reads over
 // size.
 func (d *Decoder) decodeBody(p *Pattern, size uint64) error {
-	version := make([]byte, 32)
+	version := make([]byte, sizeVersion)
 	if _, err := io.ReadFull(d, version); err != nil {
 		return errors.New("unable to decode hw version: " + err.Error())
 	}
@@ -88,7 +98,7 @@ func (d *Decoder) decodeBody(p *Pattern, size uint64) error {
 	}
 
 	// version and tempo
-	size -= (32 + 4)
+	size -= sizeVersionTempo
 
 	// decode the tracks
 	for size >= 0 {
@@ -108,7 +118,7 @@ func (d *Decoder) decodeBody(p *Pattern, size uint64) error {
 		}
 		t.Name = string(name)
 
-		steps := make([]byte, measureCount)
+		steps := make([]byte, sizeMeasure)
 		if err := binary.Read(d, binary.BigEndian, steps); err != nil {
 			return err
 		}
@@ -125,7 +135,7 @@ func (d *Decoder) decodeBody(p *Pattern, size uint64) error {
 
 		p.Tracks = append(p.Tracks, t)
 		// ID, nameLen, measureCount, and size of name
-		size -= (1 + 4 + measureCount + uint64(len(name)))
+		size -= (sizeID + sizeName + sizeMeasure + uint64(len(name)))
 	}
 
 	return nil

@@ -4,8 +4,6 @@ package drum
 
 import "fmt"
 
-const measureCount = 16
-
 // Pattern is the high level representation of the
 // drum pattern contained in a .splice file.
 type Pattern struct {
