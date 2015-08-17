@@ -56,7 +56,7 @@ func (d *Decoder) Decode(p *Pattern) error {
 // spliceHeaderInfo will read the inital bites
 // and returns the size of the file contents or error if it's
 // unable check the SPLICE portion or read the headers
-func (d *Decoder) spliceHeaderInfo() (int64, error) {
+func (d *Decoder) spliceHeaderInfo() (uint64, error) {
 	hdr := make([]byte, 6)
 	if _, err := io.ReadFull(d, hdr); err != nil {
 		return 0, err
@@ -65,7 +65,7 @@ func (d *Decoder) spliceHeaderInfo() (int64, error) {
 		return 0, errors.New("unable to decode non SPLICE files")
 	}
 
-	var size int64
+	var size uint64
 	if err := binary.Read(d, binary.BigEndian, &size); err != nil {
 		return 0, err
 	}
@@ -76,7 +76,7 @@ func (d *Decoder) spliceHeaderInfo() (int64, error) {
 // decodeBody reads the contents of the input stream up to size
 // and into p. It returns EOF or ErrUnexpectedEOF if it reads over
 // size.
-func (d *Decoder) decodeBody(p *Pattern, size int64) error {
+func (d *Decoder) decodeBody(p *Pattern, size uint64) error {
 	version := make([]byte, 32)
 	if _, err := io.ReadFull(d, version); err != nil {
 		return errors.New("unable to decode hw version: " + err.Error())
@@ -125,7 +125,7 @@ func (d *Decoder) decodeBody(p *Pattern, size int64) error {
 
 		p.Tracks = append(p.Tracks, t)
 		// ID, nameLen, measureCount, and size of name
-		size -= (1 + 4 + measureCount + int64(len(name)))
+		size -= (1 + 4 + measureCount + uint64(len(name)))
 	}
 
 	return nil
