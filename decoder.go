@@ -4,7 +4,6 @@ import (
 	"encoding/binary"
 	"errors"
 	"io"
-	"log"
 	"os"
 	"strings"
 )
@@ -20,7 +19,6 @@ func DecodeFile(path string) (*Pattern, error) {
 
 	p := &Pattern{}
 	if err := NewDecoder(file).Decode(p); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
